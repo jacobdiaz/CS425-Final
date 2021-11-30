@@ -8,6 +8,8 @@ class Cylinder {
     var colors = []; // Vertex color data
     var normals = []; // Vertex normal data
     var indices = []; // Indices data
+    var texCoords = []; // Vertex texture coordinate data
+    var texindex = []; // Texture Index for which texture to map or not
 
     // Push a vec3 color for each vertex
     for (var i = 0; i < 2 * (2 * nSectors + 2); i++) {
@@ -25,28 +27,35 @@ class Cylinder {
 
       var normal = vec3(Math.cos(theta), 0, Math.sin(theta));
       normal = normalize(normal);
+      texCoords.push(vec2(i / nSectors, 0.0));
 
       points.push(vec3(Math.cos(theta), 0, Math.sin(theta)));
       normals.push(normal);
 
       points.push(vec3(Math.cos(theta), 1, Math.sin(theta)));
       normals.push(normal);
+      texCoords.push(vec2(i / nSectors, 1.0));
 
       indices.push(halfPts + 2 * i); // Push this index to the size count
+      texindex.push(0.0);
+      texindex.push(0.0);
     }
 
     // The top and bottom of the cylinder
     for (i = 0; i < nSectors + 1; i++) {
       var theta = i * dTheta;
 
-
       points.push(vec3(Math.cos(theta), 0, Math.sin(theta)));
       normals.push(vec3(0, -1, 0));
+      texCoords.push(vec2(i / nSectors, 0.0));
 
       points.push(vec3(Math.cos(theta), 1, Math.sin(theta)));
       normals.push(vec3(0, 1, 0));
+      texCoords.push(vec2(i / nSectors, 1.0));
 
-      indices.push(halfPts + 2 * i + 1); 
+      indices.push(halfPts + 2 * i + 1);
+      texindex.push(0.0);
+      texindex.push(0.0);
     }
 
     // Push Vertex Location Data to GPU
@@ -71,11 +80,23 @@ class Cylinder {
 
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
+    // Push Texel Data to GPU
+    this.tbufferID = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.tbufferID);
+    gl.bufferData(gl.ARRAY_BUFFER, flatten(texCoords), gl.STATIC_DRAW);
+
+    // Push Texture Index Data to GPU
+    this.tibufferID = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.tibufferID);
+    gl.bufferData(gl.ARRAY_BUFFER, flatten(texindex), gl.STATIC_DRAW);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
     return;
   }
 
   render() {
-    var gl = this.gl; 
+    var gl = this.gl;
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vbufferID);
     var vPosition = gl.getAttribLocation(this.program, "vPosition");
@@ -94,6 +115,18 @@ class Cylinder {
     gl.enableVertexAttribArray(vNormal);
 
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.ibufferID);
+
+    // Connect the texel data to the program shader variables
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.tbufferID);
+    var vTexCoords = gl.getAttribLocation(this.program, "vTexCoords");
+    gl.vertexAttribPointer(vTexCoords, 2, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(vTexCoords);
+
+    // Connect the texture index data to the program shader variables
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.tibufferID);
+    var vTexIndex = gl.getAttribLocation(this.program, "vTexIndex");
+    gl.vertexAttribPointer(vTexIndex, 1, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(vTexIndex);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
 

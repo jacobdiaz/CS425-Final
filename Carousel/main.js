@@ -74,8 +74,8 @@ function render() {
   time += 1;
 
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+  
   sign.render(); // render the sign
-
   wheel.render(time, [25, 6, 12]); // Redraw the Ferris Wheel
   carousel.render(time, [8, -2, 15]); // Redraw the
   // set the shininess in the shader

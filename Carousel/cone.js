@@ -30,6 +30,7 @@ class Cone {
       normals.push(normal);
 
       indices.push(halfPts + 2 * i); // Push this index to the size count
+      
     }
 
     for (var i = 0; i < nSectors + 1; i++) {

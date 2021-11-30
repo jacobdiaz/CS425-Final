@@ -72,7 +72,7 @@
         vec3 kd1 = vec3(0.1, 0.1, 1.0); // Directional light color, strong blue
 
         // Then calculate Directed light per vertex, no ambient light here
-        vec3 Ld1 = vec3(0.7, 0.7, 0.7);		// Light material intensity of Directed light
+        vec3 Ld1 = vec3(0.7, 0.7, 0.9);		// Light material intensity of Directed light
         vec3 l1 = normalize((vec4(0.0, 0.0, 0.1, 1.0)).xyz );	// Light directional vector
         float dotProductDirected = dot(l1, fragNormal);			// Dot product of Normal & Light direction vectors
         vec3 color2 = max(dotProductDirected, 0.0) * kd1 * Ld1;
@@ -85,52 +85,55 @@
     </script>
 
     <script id="fragment-shader" type="x-shader/x-fragment">
-          precision mediump float;
+            precision mediump float;
 
-          varying vec4 color;
-          varying vec3 fragNormal;	// Fragment normal
-          varying vec3 fragEye;		// Fragment eye vector
-          varying vec2 fTexCoords;	// Fragment texture coordinates
-          varying float fTexIndex;	// Texture Index
+            varying vec4 color;
+            varying vec3 fragNormal;	// Fragment normal
+            varying vec3 fragEye;		// Fragment eye vector
+            varying vec2 fTexCoords;	// Fragment texture coordinates
+            varying float fTexIndex;	// Texture Index
 
-          uniform sampler2D uTextureMap;
+            uniform sampler2D uTextureMap;
 
-          void main( ) {
-            gl_FragColor = color;
-            vec4 texture = color;
+            void main( ) {
+              gl_FragColor = color;
+              vec4 texture = color;
 
-            if(fTexIndex == 1.0){
-              texture = color * texture2D( uTextureMap, fTexCoords );
-            }
-            else {
-              texture = color;
-            }
-            		// Then we do the Point light in the fragment shader for Phong Shading
-      // The light colors for the Point light
-      vec3 ka = vec3(0.8, 1.0, 0.8);	// Ambient light color, bright slight green
-      vec3 kd = vec3(1.0, 0.1, 0.1); 	// Diffuse light color, strong red
-      vec3 ks = vec3(2.0, 2.0, 2.0);	// Specular light color, strong white
+              if(fTexIndex == 2.0){
+                texture = texture2D( uTextureMap, fTexCoords ) * color;
+              }
+              if(fTexIndex == 0.0){
+                texture = color;
+              }
 
-      // Calculate ambient light, same for both lights
-      vec3 Iau = vec3(0.6, 0.6, 0.6);	// Intensity (reflectivity material) of ambient light
-      vec3 color3 = ka * Iau;	// Add ambient light
 
-      // Then add diffuse light
-      vec3 Ld = vec3(0.7, 0.7, 0.7);		// Light source intensity of diffuse light
-      //vec3 l = normalize((vec4(0.2, 0.3, -0.9, 1.0)).xyz );	// Light directional vector
-      vec3 l = normalize((vec4(0.2, 0.3, -0.9, 1.0)).xyz + fragEye);	// Light directional vector
-      float dotProductD = dot(l, fragNormal );			// Dot product of Normal & Light direction vectors
-      color3 = color3 + max(dotProductD, 0.0) * kd * Ld;		// Add diffuse light
+        // Then we do the Point light in the fragment shader for Phong Shading
+        // The light colors for the Point light
+        vec3 ka = vec3(0.8, 1.0, 0.8);	// Ambient light color, bright slight green
+        vec3 kd = vec3(1.0, 0.1, 0.1); 	// Diffuse light color, strong red
+        vec3 ks = vec3(2.0, 2.0, 2.0);	// Specular light color, strong white
 
-      // Then add specular light, for only the first light
-      vec3 Ls = vec3(1.0, 1.0, 1.0);		// Light source intensity of specular light
-      vec3 h = normalize((l + fragEye) / 2.0) ;				// Half-length vector from light & eye vector
-      float dotProductS = dot(h, fragNormal);					// Dot product of Normal & half-length direction vectors
-      float spec = pow((max(dotProductS, 0.0)), 3.0) ;
-      color3 = color3 + (spec * ks * Ls);					// Add specular light
+        // Calculate ambient light, same for both lights
+        vec3 Iau = vec3(0.6, 0.6, 0.6);	// Intensity (reflectivity material) of ambient light
+        vec3 color3 = ka * Iau;	// Add ambient light
 
-      gl_FragColor = texture * vec4(color3, 1);	// The Blinn-Phong light for the vertex
-          }
+        // Then add diffuse light
+        vec3 Ld = vec3(0.9, 0.9, 0.9);		// Light source intensity of diffuse light
+        //vec3 l = normalize((vec4(0.2, 0.3, -0.9, 1.0)).xyz );	// Light directional vector
+        vec3 l = normalize((vec4(0.2, 0.3, -0.9, 1.0)).xyz + fragEye);	// Light directional vector
+        float dotProductD = dot(l, fragNormal );			// Dot product of Normal & Light direction vectors
+        color3 = color3 + max(dotProductD, 0.0) * kd * Ld;		// Add diffuse light
+
+        // Then add specular light, for only the first light
+        vec3 Ls = vec3(1.0, 1.0, 1.0);		// Light source intensity of specular light
+        vec3 h = normalize((l + fragEye) / 2.0) ;				// Half-length vector from light & eye vector
+        float dotProductS = dot(h, fragNormal);					// Dot product of Normal & half-length direction vectors
+        float spec = pow((max(dotProductS, 0.0)), 3.0) ;
+        color3 = color3 + (spec * ks * Ls);					// Add specular light
+
+        gl_FragColor = texture * vec4(color3, 1);	// The Blinn-Phong light for the vertex
+          return;
+      }
     </script>
   </head>
   <body style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh">
