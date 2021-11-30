@@ -1,0 +1,129 @@
+<!DOCTYPE >
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Assignment 3</title>
+
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+    <script src="https://webglfundamentals.org/webgl/resources/webgl-utils.js"></script>
+    <script src="https://webglfundamentals.org/webgl/resources/webgl-lessons-ui.js"></script>
+    <script type="text/javascript" src="../Common/MV.js"></script>
+    <script type="text/javascript" src="../Common/initShaders.js"></script>
+    <script type="text/javascript" src="../Common/webgl-utils.js"></script>
+    <script type="text/javascript" src="Carousel.js"></script>
+    <script type="text/javascript" src="main.js"></script>
+    <script type="text/javascript" src="Wheel.js"></script>
+    <script type="text/javascript" src="cone.js"></script>
+    <script type="text/javascript" src="cylinder.js"></script>
+    <script type="text/javascript" src="sphere.js"></script>
+
+    <script id="vertex-shader" type="x-shader/x-vertex">
+      // Attributes are values that vary from vertex to vertex
+      attribute vec3 vPosition;	// Vertex position data in 3D space
+      attribute vec3 vColor;		// Vertex color data - Not needed for all applications
+      attribute vec3 vNormal;		// Normal position data
+
+      // Uniform variables are shared for all vertices
+      uniform mat4 uViewXform;		// Camera Model View Matrix
+      uniform mat4 uProjection;		// Camera Projection Matrix
+      uniform mat3 vNormalTransformation;	// Transformation matrix for normal vectors
+      uniform mat4 uModelXform;	// Model transformation matrix
+      // "modelView" is the product of uModelXform * uViewXform
+
+      // Varying values are passed from vertex shader to fragment shader
+      varying vec4 color;		// Interpolated color
+      varying vec3 fragNormal;	// Fragment normal
+      varying vec3 fragEye;		// Fragment eye vector
+
+      // Variables needed for lighting.  Hard code for a first pass
+      vec3 ambientLight = vec3( 0.5, 0.5, 0.5 );	// 0.2, 0.2, 0.2
+      vec3 diffuseLight = vec3( 1, 1, 1 );	// 0.5, 0.5, 0.5
+      vec3 specularLight = vec3( 1.0, 1.0, 1.0 );	// 1.0, 1.0, 1.0
+
+      // Pass in uniform variables that need to change as the program runs
+      uniform vec3 uLightPosition; // Position of light source.  Already transformed in world coordinates
+      uniform mat3 uNormalMatrix;	 // Transformation matrix to apply to vertex normals
+
+      float shininess;
+
+      void main( ) {
+       precision mediump float;
+
+
+      // First set the position of the vertex, projected to screen coordinates
+       gl_Position = uProjection * uViewXform * uModelXform * vec4( vPosition, 1.0 );
+
+        vec3 ambientMaterial = vec3( vColor );
+      	vec3 diffuseMaterial = vec3( vColor );
+      	vec3 specularMaterial = vec3( 1.0, 0.0, 0.0 ); // white
+      	shininess = 1.0;
+
+        vec3 ambientProduct = ambientMaterial * ambientLight;
+      	vec3 diffuseProduct = diffuseMaterial * diffuseLight;
+      	vec3 specularProduct = specularMaterial * specularLight;
+
+      	// The vertex position is mapped to eye coordinates, but not to screen coordinates
+      	vec3 position = ( uViewXform * uModelXform * vec4( vPosition, 1.0 ) ).xyz;
+
+        // The eye is the origin of eye coordinates.  Eye vector points from position to the eye ( origin )
+      	vec3 view = normalize( -position );
+
+        vec3 light = normalize( ( uViewXform * vec4( uLightPosition, 1.0 ) ).xyz - position );
+      	vec3 vNormal = vPosition;		// For spheres, normals and positions are identical
+      	vec3 normal = normalize( uNormalMatrix * vNormal );
+
+        // the halfway vector is the "average" of the eye and light vectors
+      	vec3 halfway = normalize( view + light );
+
+        // Next calculate the two dot products
+      	float lightDotNormal = dot( light, normal );
+      	float normalDotHalf = dot( normal, halfway );
+
+        color = vec4(   ambientProduct
+        + diffuseProduct  * max( lightDotNormal, 0.0 )
+        + specularProduct * pow( max( normalDotHalf, 0.0 ), shininess )
+        , 1.0 );
+      	return;
+
+      }
+    </script>
+
+    <script id="fragment-shader" type="x-shader/x-fragment">
+      precision mediump float;
+
+      varying vec4 color;
+
+      void main( ) {
+      	gl_FragColor =  color;
+      }
+    </script>
+  </head>
+  <body style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh">
+    <div
+      style="
+        padding-left: 7vw;
+        padding-right: 7vw;
+        padding-top: 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      "
+    >
+      <canvas id="gl-canvas" width="800" height="450" style="border-radius: 8px; padding-top: 15%"> </canvas>
+      <div id="uiContainer">
+        <div id="ui">
+          <div id="shininess"></div>
+        </div>
+      </div>
+      <h1>Assignment 3 - Lighting & Shading</h1>
+      <h3>Jacob Diaz - jdiaz88@uic.edu</h3>
+      <p>
+        Hello this is my homework 3.<span style="font-weight: bold"> I am using a late day for this assignment</span>. In this model, you
+        can see Gouraud shading with a light on both the ferris wheel and the carousel. You are also able to use the keys to move around the
+        scene. Use ASDW to move the camera and go closer and further away. I had used our classes lab as some tutorials found online as a
+        guide for this assignment. I ran out of time with this assignment so there are some things that are not complete and are missing.
+      </p>
+    </div>
+  </body>
+</html>
