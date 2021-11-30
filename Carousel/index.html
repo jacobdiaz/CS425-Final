@@ -16,12 +16,15 @@
     <script type="text/javascript" src="cone.js"></script>
     <script type="text/javascript" src="cylinder.js"></script>
     <script type="text/javascript" src="sphere.js"></script>
+    <script type="text/javascript" src="sign.js"></script>
 
     <script id="vertex-shader" type="x-shader/x-vertex">
       // Attributes are values that vary from vertex to vertex
       attribute vec3 vPosition;	// Vertex position data in 3D space
       attribute vec3 vColor;		// Vertex color data - Not needed for all applications
       attribute vec3 vNormal;		// Normal position data
+      attribute vec2 vTexCoords;	// Texture Coordinates
+      attribute float vTexIndex;	// Texture Index, to know what texture to use
 
       // Uniform variables are shared for all vertices
       uniform mat4 uViewXform;		// Camera Model View Matrix
@@ -34,6 +37,9 @@
       varying vec4 color;		// Interpolated color
       varying vec3 fragNormal;	// Fragment normal
       varying vec3 fragEye;		// Fragment eye vector
+      varying vec2 fTexCoords;		// Texture coordinates passed to fragment shader
+      varying float fTexIndex;	// Texture Index
+
 
       // Variables needed for lighting.  Hard code for a first pass
       vec3 ambientLight = vec3( 0.5, 0.5, 0.5 );	// 0.2, 0.2, 0.2
@@ -47,58 +53,89 @@
       float shininess;
 
       void main( ) {
-       precision mediump float;
+        precision mediump float; vTexCoords;
 
 
-      // First set the position of the vertex, projected to screen coordinates
-       gl_Position = uProjection * uViewXform * uModelXform * vec4( vPosition, 1.0 );
+        // First set the position of the vertex, projected to screen coordinates
+        gl_Position = uProjection * uViewXform * uModelXform * vec4( vPosition, 1.0 );
 
-        vec3 ambientMaterial = vec3( vColor );
-      	vec3 diffuseMaterial = vec3( vColor );
-      	vec3 specularMaterial = vec3( 1.0, 0.0, 0.0 ); // white
-      	shininess = 1.0;
+        fTexCoords = vTexCoords;
+        fTexIndex = vTexIndex;
+        color = vec4( vColor, 1 );
 
-        vec3 ambientProduct = ambientMaterial * ambientLight;
-      	vec3 diffuseProduct = diffuseMaterial * diffuseLight;
-      	vec3 specularProduct = specularMaterial * specularLight;
+        		// Calculate the normal and eye positions for the lighting calculations
+        fragNormal = normalize(vNormalTransformation * vNormal);
+        fragEye = - normalize(vNormalTransformation * vPosition);
 
-      	// The vertex position is mapped to eye coordinates, but not to screen coordinates
-      	vec3 position = ( uViewXform * uModelXform * vec4( vPosition, 1.0 ) ).xyz;
 
-        // The eye is the origin of eye coordinates.  Eye vector points from position to the eye ( origin )
-      	vec3 view = normalize( -position );
+        // First we do the Directed light in the vertex shader for Gaurand Shading
+        vec3 kd1 = vec3(0.1, 0.1, 1.0); // Directional light color, strong blue
 
-        vec3 light = normalize( ( uViewXform * vec4( uLightPosition, 1.0 ) ).xyz - position );
-      	vec3 vNormal = vPosition;		// For spheres, normals and positions are identical
-      	vec3 normal = normalize( uNormalMatrix * vNormal );
+        // Then calculate Directed light per vertex, no ambient light here
+        vec3 Ld1 = vec3(0.7, 0.7, 0.7);		// Light material intensity of Directed light
+        vec3 l1 = normalize((vec4(0.0, 0.0, 0.1, 1.0)).xyz );	// Light directional vector
+        float dotProductDirected = dot(l1, fragNormal);			// Dot product of Normal & Light direction vectors
+        vec3 color2 = max(dotProductDirected, 0.0) * kd1 * Ld1;
 
-        // the halfway vector is the "average" of the eye and light vectors
-      	vec3 halfway = normalize( view + light );
+        color = color + vec4(color2, 1); // Add Directed light
 
-        // Next calculate the two dot products
-      	float lightDotNormal = dot( light, normal );
-      	float normalDotHalf = dot( normal, halfway );
-
-        color = vec4(   ambientProduct
-        + diffuseProduct  * max( lightDotNormal, 0.0 )
-        + specularProduct * pow( max( normalDotHalf, 0.0 ), shininess )
-        , 1.0 );
       	return;
 
       }
     </script>
 
     <script id="fragment-shader" type="x-shader/x-fragment">
-      precision mediump float;
+          precision mediump float;
 
-      varying vec4 color;
+          varying vec4 color;
+          varying vec3 fragNormal;	// Fragment normal
+          varying vec3 fragEye;		// Fragment eye vector
+          varying vec2 fTexCoords;	// Fragment texture coordinates
+          varying float fTexIndex;	// Texture Index
 
-      void main( ) {
-      	gl_FragColor =  color;
-      }
+          uniform sampler2D uTextureMap;
+
+          void main( ) {
+            gl_FragColor = color;
+            vec4 texture = color;
+
+            if(fTexIndex == 1.0){
+              texture = color * texture2D( uTextureMap, fTexCoords );
+            }
+            else {
+              texture = color;
+            }
+            		// Then we do the Point light in the fragment shader for Phong Shading
+      // The light colors for the Point light
+      vec3 ka = vec3(0.8, 1.0, 0.8);	// Ambient light color, bright slight green
+      vec3 kd = vec3(1.0, 0.1, 0.1); 	// Diffuse light color, strong red
+      vec3 ks = vec3(2.0, 2.0, 2.0);	// Specular light color, strong white
+
+      // Calculate ambient light, same for both lights
+      vec3 Iau = vec3(0.6, 0.6, 0.6);	// Intensity (reflectivity material) of ambient light
+      vec3 color3 = ka * Iau;	// Add ambient light
+
+      // Then add diffuse light
+      vec3 Ld = vec3(0.7, 0.7, 0.7);		// Light source intensity of diffuse light
+      //vec3 l = normalize((vec4(0.2, 0.3, -0.9, 1.0)).xyz );	// Light directional vector
+      vec3 l = normalize((vec4(0.2, 0.3, -0.9, 1.0)).xyz + fragEye);	// Light directional vector
+      float dotProductD = dot(l, fragNormal );			// Dot product of Normal & Light direction vectors
+      color3 = color3 + max(dotProductD, 0.0) * kd * Ld;		// Add diffuse light
+
+      // Then add specular light, for only the first light
+      vec3 Ls = vec3(1.0, 1.0, 1.0);		// Light source intensity of specular light
+      vec3 h = normalize((l + fragEye) / 2.0) ;				// Half-length vector from light & eye vector
+      float dotProductS = dot(h, fragNormal);					// Dot product of Normal & half-length direction vectors
+      float spec = pow((max(dotProductS, 0.0)), 3.0) ;
+      color3 = color3 + (spec * ks * Ls);					// Add specular light
+
+      gl_FragColor = texture * vec4(color3, 1);	// The Blinn-Phong light for the vertex
+          }
     </script>
   </head>
   <body style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh">
+    <p><img id="bricks" src="spongeSquare.jpg" hidden /></p>
+
     <div
       style="
         padding-left: 7vw;

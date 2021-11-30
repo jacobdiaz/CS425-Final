@@ -2,6 +2,8 @@ let program; // The shader program
 let gl; // WebGL graphics environment
 let carousel;
 let wheel;
+let sign;
+
 // Camera variables
 let eye = vec4(20.0, 2.0, 15.0);
 let originalEye = vec4(30.0, 2.0, 15.0);
@@ -31,6 +33,7 @@ window.onload = init = () => {
 
   // Set the lightposition as a vec3 at the origin and send it to the GPU
 
+  sign = new Sign(gl, program);
   carousel = new Carousel(gl, program);
   wheel = new Wheel(gl, program);
 
@@ -71,9 +74,10 @@ function render() {
   time += 1;
 
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+  sign.render(); // render the sign
+
   wheel.render(time, [25, 6, 12]); // Redraw the Ferris Wheel
   carousel.render(time, [8, -2, 15]); // Redraw the
-
   // set the shininess in the shader
   let uShininessLoc = gl.getUniformLocation(program, "uShininess");
   gl.uniform1f(uShininessLoc, shine);
