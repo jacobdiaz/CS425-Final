@@ -44,7 +44,7 @@ class Carousel {
     // Carousel Frame consists of a base acylindar, a top acylindar, and a middle acylindar
     this.base = new Cone(60, gl, program, baseColor);
     this.centerPole = new Cylinder(25, gl, program, baseColor, 1.0);
-    this.top = new Cone(10, gl, program, vec3(0, 1, 0));
+    this.top = new Cone(10, gl, program, vec3(0.6, 0.4, 0.6));
 
     this.cones = [];
     this.cylinders = [];

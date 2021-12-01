@@ -19,13 +19,9 @@ class Sign {
       points.push(vec3(0, size, depth));
       points.push(vec3(size, size, depth));
     }
-    if(imageSrc == "concrete"){
-        points.push(vec3(0, 0, depth));
-        points.push(vec3(0, size-20, depth));
-        points.push(vec3(size-20, 0, depth));
-        points.push(vec3(size-20, 0, depth));
-        points.push(vec3(0, size-20, depth));
-        points.push(vec3(size, size-20, depth));
+
+    // Todo makes some concrete
+    if (imageSrc == "concrete") {
     }
     // Calculate the normal for this sign
     var normal = cross(subtract(vec3(0, size, depth), vec3(0, 0, depth)), subtract(vec3(size, 0, depth), vec3(0, 0, depth)));

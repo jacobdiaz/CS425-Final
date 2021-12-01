@@ -34,6 +34,7 @@ window.onload = init = () => {
   // Set the lightposition as a vec3 at the origin and send it to the GPU
   sign = new Sign(gl, program, "spongeBob");
   ground = new Ground(gl, program);
+  train = new Train(gl, program);
   carousel = new Carousel(gl, program);
   wheel = new Wheel(gl, program);
 
@@ -77,8 +78,9 @@ function render() {
 
   sign.render(); // render the sign
   ground.render([12, -3, 12]);
-  wheel.render(time, [10, 8, 12]); // Redraw the Ferris Wheel
-  carousel.render(time, [8, -2, 20]); // Redraw the
+  train.render(time, [0, -4, 22]);
+  wheel.render(time, [10, 8, 12]);
+  carousel.render(time, [8, -2, 20]);
   // set the shininess in the shader
   let uShininessLoc = gl.getUniformLocation(program, "uShininess");
   gl.uniform1f(uShininessLoc, shine);

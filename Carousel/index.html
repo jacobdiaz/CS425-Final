@@ -1,10 +1,13 @@
+<!-- Jacob Diaz -->
+<!-- jdiaz88 -->
 <!DOCTYPE >
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <title>Assignment 3</title>
+    <title>Assignment 4</title>
 
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
+    <!-- Using webgl fundemetals for the slider!  -->
     <script src="https://webglfundamentals.org/webgl/resources/webgl-utils.js"></script>
     <script src="https://webglfundamentals.org/webgl/resources/webgl-lessons-ui.js"></script>
     <script type="text/javascript" src="../Common/MV.js"></script>
@@ -13,6 +16,7 @@
     <script type="text/javascript" src="Carousel.js"></script>
     <script type="text/javascript" src="main.js"></script>
     <script type="text/javascript" src="ground.js"></script>
+    <script type="text/javascript" src="train.js"></script>
     <script type="text/javascript" src="Wheel.js"></script>
     <script type="text/javascript" src="cone.js"></script>
     <script type="text/javascript" src="cylinder.js"></script>
@@ -32,7 +36,6 @@
       uniform mat4 uProjection;		// Camera Projection Matrix
       uniform mat3 vNormalTransformation;	// Transformation matrix for normal vectors
       uniform mat4 uModelXform;	// Model transformation matrix
-      // "modelView" is the product of uModelXform * uViewXform
 
       // Varying values are passed from vertex shader to fragment shader
       varying vec4 color;		// Interpolated color
@@ -43,9 +46,9 @@
 
 
       // Variables needed for lighting.  Hard code for a first pass
-      vec3 ambientLight = vec3( 0.5, 0.5, 0.5 );	// 0.2, 0.2, 0.2
-      vec3 diffuseLight = vec3( 1, 1, 1 );	// 0.5, 0.5, 0.5
-      vec3 specularLight = vec3( 1.0, 1.0, 1.0 );	// 1.0, 1.0, 1.0
+      vec3 ambientLight = vec3( 0.5, 0.5, 0.5 );
+      vec3 diffuseLight = vec3( 1, 1, 1 );
+      vec3 specularLight = vec3( 1.0, 1.0, 1.0 );
 
       // Pass in uniform variables that need to change as the program runs
       uniform vec3 uLightPosition; // Position of light source.  Already transformed in world coordinates
@@ -158,7 +161,7 @@
           <div id="shininess"></div>
         </div>
       </div>
-      <h1>Assignment 3 - Lighting & Shading</h1>
+      <h1>Assignment 4 - Texture</h1>
       <h3>Jacob Diaz - jdiaz88@uic.edu</h3>
       <p>
         Hello this is my homework 3.<span style="font-weight: bold"> I am using a late day for this assignment</span>. In this model, you
