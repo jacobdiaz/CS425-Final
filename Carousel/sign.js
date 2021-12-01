@@ -4,26 +4,22 @@ class Sign {
     this.gl = gl;
     this.program = program;
 
-    var points = []; // Vertex location data
-    var colors = []; // Vertex color data
-    var normals = []; // Vertex normal data
     var texCoords = []; // Vertex texture coordinate data
     var texindex = []; // Texture Index for which texture to map or not
+    var colors = []; // Vertex color data
+    var points = []; // Vertex location data
+    var normals = []; // Vertex normal data
 
     var size = 80;
     var depth = 120;
-    if (imageSrc == "spongeBob") {
-      points.push(vec3(0, 0, depth));
-      points.push(vec3(0, size, depth));
-      points.push(vec3(size, 0, depth));
-      points.push(vec3(size, 0, depth));
-      points.push(vec3(0, size, depth));
-      points.push(vec3(size, size, depth));
-    }
 
-    // Todo makes some concrete
-    if (imageSrc == "concrete") {
-    }
+    points.push(vec3(0, 0, depth));
+    points.push(vec3(0, size, depth));
+    points.push(vec3(size, 0, depth));
+    points.push(vec3(size, 0, depth));
+    points.push(vec3(0, size, depth));
+    points.push(vec3(size, size, depth));
+
     // Calculate the normal for this sign
     var normal = cross(subtract(vec3(0, size, depth), vec3(0, 0, depth)), subtract(vec3(size, 0, depth), vec3(0, 0, depth)));
     for (var i = 0; i < 6; i++) {

@@ -8,12 +8,15 @@ let sign;
 let wheelSpeed = 1;
 let trainSpeed = 1;
 let carouselSpeed = 1;
+let image = 1;
+let imageString = "afirm1";
+// Set the original image to spongebob and image index to 1
 
 // Camera variables
 let eye = vec4(20.0, 2.0, 15.0);
 let originalEye = vec4(30.0, 2.0, 15.0);
 let cameraXform = mat4();
-let lookEYE = vec3(-16, 5.5, 8); 
+let lookEYE = vec3(-16, 5.5, 8);
 let lookAT = vec3(8, 0, 3);
 let lookUP = vec3(0, 1, 0);
 let viewXform;
@@ -26,6 +29,7 @@ window.onload = init = () => {
   webglLessonsUI.setupSlider("#wheelSpeed", { value: 1, slide: updateWheelSpeed, min: -1.0, max: 6.0 });
   webglLessonsUI.setupSlider("#trainSpeed", { value: 1, slide: updateTrainSpeed, min: -1.0, max: 6.0 });
   webglLessonsUI.setupSlider("#carouselSpeed", { value: 1, slide: updateCarouselSpeed, min: -1.0, max: 6.0 });
+  webglLessonsUI.setupSlider("#image", { value: 1, slide: updateImage, min: 1.0, max: 4.0 });
 
   gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
@@ -40,7 +44,6 @@ window.onload = init = () => {
   gl.uniformMatrix3fv(vNormalTransformation, false, flatten(normalTransformation));
 
   // Instantiate new componentes
-  sign = new Sign(gl, program, "spongeBob");
   ground = new Ground(gl, program);
   train = new Train(gl, program);
   carousel = new Carousel(gl, program);
@@ -85,6 +88,8 @@ function render() {
 
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
+  sign = new Sign(gl, program, imageString);
+
   // Render all the components
   sign.render();
   ground.render([12, -3, 12]);
@@ -107,6 +112,23 @@ function updateTrainSpeed(event, ui) {
 }
 function updateCarouselSpeed(event, ui) {
   carouselSpeed = ui.value;
+}
+function updateImage(event, ui) {
+  input = ui.value;
+  switch (input) {
+    case 1:
+      imageString = "afirm1";
+      break;
+    case 2:
+      imageString = "afirm2";
+      break;
+    case 3:
+      imageString = "afirm3";
+      break;
+    case 4:
+      imageString = "afirm4";
+      break;
+  }
 }
 
 function calcNormalMatrix(viewXform, modelXform) {
