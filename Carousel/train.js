@@ -1,15 +1,8 @@
 class Train {
   constructor(gl, program) {
-    this.program = program;
-    this.gl = gl;
+    let distance = 60; // Radius of the train route
 
-    // #region Colors
-    let coneColors = vec3(1, 1, 1);
-    // #endregion
-
-    let distance = 60;
-    // #region Translations
-    let coneTranslation = [
+    let cylTranslation = [
       [distance, 2.5, 1.5], // center chasis
       [distance, 2.5, 4.5], // Front grill
       [distance - 6, 1.5, 1.5], //wheel
@@ -26,58 +19,56 @@ class Train {
     ];
 
     var axes = [
-      [-1, 0, 0],
-      [-1, 0, 0],
-      [-1, 0, 0],
-      [-1, 0, 0],
-      [0, 1, 0],
+      [-1, 0, 0], // Laying flat
+      [-1, 0, 0], // Laying flat
+      [-1, 0, 0], // Laying flat
+      [-1, 0, 0], // Laying flat
+      [0, 1, 0], // Pointing to sky
     ];
 
     let colors = [
-      [0.3, 0.3, 0.3],
-      [0.1, 0.1, 0.1], // grey
-      [0.6, 0.6, 0.6],
-      [0.6, 0.6, 0.6],
-      [0.8, 0.3, 0.3],
+      [0.3, 0.3, 0.3], // grey
+      [0.1, 0.1, 0.1], // dark grey
+      [0.6, 0.6, 0.6], // light grey
+      [0.6, 0.6, 0.6], // light grey
+      [0.8, 0.3, 0.3], // redish
     ];
 
-    let coneScale = scalem(2, 2, 2);
+    let cylScale = scalem(2, 2, 2);
 
-    this.cones = [];
+    this.cyls = [];
     this.cylinders = [];
-    this.coneXform = [];
+    this.cylXform = [];
 
-    // Perform the cone transformations for each of the 4 cones
+    // Perform the cyl transformations for each of the 4 cyls
     for (let i = 0; i < 5; i++) {
-      let coneRot = rotate(90, axes[i]);
-      let coneTrans = translate(coneTranslation[i][0], coneTranslation[i][1], coneTranslation[i][2]);
-      let Xform = mult(coneRot, coneScale);
+      let cylRot = rotate(90, axes[i]);
+      let cylTrans = translate(cylTranslation[i][0], cylTranslation[i][1], cylTranslation[i][2]);
+      let Xform = mult(cylRot, cylScale);
       Xform = mult(Xform, scales[i]);
-      this.cones[i] = new Cylinder(8, gl, program, colors[i]);
-      this.coneXform[i] = mult(coneTrans, Xform);
+      this.cyls[i] = new Cylinder(8, gl, program, colors[i]);
+      this.cylXform[i] = mult(cylTrans, Xform);
     }
   }
 
-  render(time, position) {
-    let train_rotation = rotateY(-time / 1.5); // Get the rotation matrix of the train
+  render(time, position, speed) {
+    const originalSpeed = -time / 1.5;
+    let train_rotation = rotateY(originalSpeed * speed);
     let train_translation = mat4();
 
-    // If given valid position, set the translate matrix, otherwise ignore
     train_translation = translate(position[0], position[1], position[2]);
 
-    let train_Xform = mult(train_translation, train_rotation); // The overall train transformation
+    let train_Xform = mult(train_translation, train_rotation);
     let uModelXform = gl.getUniformLocation(program, "uModelXform");
     let vNormalTransformation = gl.getUniformLocation(program, "vNormalTransformation");
 
     for (let i = 0; i < 5; i++) {
-      // Generates the overall transformation of the cone relative to the train and moves it up and down
-      let htransformation = mult(translate(0, 0, 0), this.coneXform[i]);
-      // Combine with the train transformation to get final position of the cone, render it
+      let htransformation = mult(translate(0, 0, 0), this.cylXform[i]);
       htransformation = mult(train_Xform, htransformation);
       gl.uniformMatrix4fv(uModelXform, false, flatten(htransformation));
       let hnormalTransformation = normalMatrix(htransformation, true);
       gl.uniformMatrix3fv(vNormalTransformation, false, flatten(hnormalTransformation));
-      this.cones[i].render();
+      this.cyls[i].render();
     }
   }
 }

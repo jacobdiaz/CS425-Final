@@ -83,8 +83,6 @@
 
         color = color + vec4(color2, 1); // Add Directed light
 
-      	return;
-
       }
     </script>
 
@@ -106,10 +104,6 @@
               if(fTexIndex == 2.0){
                 texture = texture2D( uTextureMap, fTexCoords ) * color;
               }
-              if(fTexIndex == 0.0){
-                texture = color;
-              }
-
 
         // Then we do the Point light in the fragment shader for Phong Shading
         // The light colors for the Point light
@@ -117,26 +111,24 @@
         vec3 kd = vec3(1.0, 0.1, 0.1); 	// Diffuse light color, strong red
         vec3 ks = vec3(2.0, 2.0, 2.0);	// Specular light color, strong white
 
-        // Calculate ambient light, same for both lights
-        vec3 Iau = vec3(0.6, 0.6, 0.6);	// Intensity (reflectivity material) of ambient light
-        vec3 color3 = ka * Iau;	// Add ambient light
+        //  ambient light
+        vec3 Iau = vec3(0.6, 0.6, 0.6);	//reflectivity material
+        vec3 color3 = ka * Iau;
 
-        // Then add diffuse light
-        vec3 Ld = vec3(0.9, 0.9, 0.9);		// Light source intensity of diffuse light
-        //vec3 l = normalize((vec4(0.2, 0.3, -0.9, 1.0)).xyz );	// Light directional vector
-        vec3 l = normalize((vec4(0.2, 0.3, -0.9, 1.0)).xyz + fragEye);	// Light directional vector
-        float dotProductD = dot(l, fragNormal );			// Dot product of Normal & Light direction vectors
-        color3 = color3 + max(dotProductD, 0.0) * kd * Ld;		// Add diffuse light
+        // diffuse light
+        vec3 Ld = vec3(1, 1, 1);		//  intensity of diffuse light
+        vec3 l = normalize((vec4(0.2, 0.3, -0.9, 1.0)).xyz + fragEye);
+        float dotProductD = dot(l, fragNormal );
+        color3 = color3 + max(dotProductD, 0.0) * kd * Ld;		// Add diffuse
 
-        // Then add specular light, for only the first light
-        vec3 Ls = vec3(1.0, 1.0, 1.0);		// Light source intensity of specular light
-        vec3 h = normalize((l + fragEye) / 2.0) ;				// Half-length vector from light & eye vector
-        float dotProductS = dot(h, fragNormal);					// Dot product of Normal & half-length direction vectors
-        float spec = pow((max(dotProductS, 0.0)), 3.0) ;
-        color3 = color3 + (spec * ks * Ls);					// Add specular light
+        // specular light
+        vec3 Ls = vec3(1.0, 1.0, 1.0);
+        vec3 h = normalize((l + fragEye) / 2.0) ;
+        float dotProductS = dot(h, fragNormal);
+        float spec = pow((max(dotProductS, 0.0)), 8.0) ; // Specular
+        color3 = color3 + (spec * ks * Ls);
 
-        gl_FragColor = texture * vec4(color3, 1);	// The Blinn-Phong light for the vertex
-          return;
+        gl_FragColor = texture * vec4(color3, 1);
       }
     </script>
   </head>
@@ -155,20 +147,33 @@
         align-items: center;
       "
     >
-      <canvas id="gl-canvas" width="800" height="450" style="border-radius: 8px; padding-top: 15%"> </canvas>
-      <div id="uiContainer">
-        <div id="ui">
-          <div id="shininess"></div>
+      <div style="display: flex; flex-direction: row; margin-top: 30vh">
+        <canvas id="gl-canvas" width="800" height="450" style="border-radius: 8px"> </canvas>
+        <div id="uiContainer" style="background-color: rgb(247, 247, 247); border-radius: 8px; margin-left: 15px; padding: 15px">
+          <div id="ui">
+            <div id="wheelSpeed"></div>
+            <div id="trainSpeed"></div>
+            <div id="carouselSpeed"></div>
+          </div>
         </div>
       </div>
-      <h1>Assignment 4 - Texture</h1>
+      <h1>CS 425 Assignment 4 - Texture</h1>
       <h3>Jacob Diaz - jdiaz88@uic.edu</h3>
       <p>
-        Hello this is my homework 3.<span style="font-weight: bold"> I am using a late day for this assignment</span>. In this model, you
-        can see Gouraud shading with a light on both the ferris wheel and the carousel. You are also able to use the keys to move around the
-        scene. Use ASDW to move the camera and go closer and further away. I had used our classes lab as some tutorials found online as a
-        guide for this assignment. I ran out of time with this assignment so there are some things that are not complete and are missing.
+        Hello this is my assignment 4. The texture in this project is used in the spongeBob sign. This assignment also addresses lighting
+        issues found in the last assignment. Some new additions to this assignment from the last one is that there is now a ground
+        component. Another addition to this project is the train component that circles around the carousel. You will also notice that in
+        this project you are able to change the speed and even stop completely the different components. Some things that are not working,
+        is the ground component was going to have a texture on it but doesn't. Also the changing speed feature is a little glitchy.
       </p>
+
+      <h3>Resources</h3>
+      <p>Spongebob</p>
+      <span>
+        <a href="https://ftw.usatoday.com/2017/05/what-is-spongebob-meme-mean-mocking-internet-chicken-episode-twitter-jokes"
+          >https://ftw.usatoday.com/2017/05/what-is-spongebob-meme-mean-mocking-internet-chicken-episode-twitter-jokes</a
+        ></span
+      >
     </div>
   </body>
 </html>

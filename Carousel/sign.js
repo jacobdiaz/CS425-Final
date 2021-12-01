@@ -1,7 +1,8 @@
+// Sponge bob sign
 class Sign {
   constructor(gl, program, imageSrc) {
-    this.gl = gl; // WebGL graphics environment
-    this.program = program; // The shader program
+    this.gl = gl;
+    this.program = program;
 
     var points = []; // Vertex location data
     var colors = []; // Vertex color data
@@ -80,50 +81,39 @@ class Sign {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
-
-    return;
   }
 
   render() {
-    var gl = this.gl; // Since we are seperated with classes
+    var gl = this.gl;
 
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
-    // Connect the vertex data to the program shader variables
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vbufferID);
     var vPosition = gl.getAttribLocation(this.program, "vPosition");
     gl.vertexAttribPointer(vPosition, 3, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(vPosition);
 
-    // Connect the color data to the program shader variables
     gl.bindBuffer(gl.ARRAY_BUFFER, this.cbufferID);
     var vColor = gl.getAttribLocation(this.program, "vColor");
     gl.vertexAttribPointer(vColor, 3, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(vColor);
 
-    // Connect the normal data to the program shader variables
     gl.bindBuffer(gl.ARRAY_BUFFER, this.nbufferID);
     var vNormal = gl.getAttribLocation(this.program, "vNormal");
     gl.vertexAttribPointer(vNormal, 3, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(vNormal);
 
-    // Connect the texel data to the program shader variables
     gl.bindBuffer(gl.ARRAY_BUFFER, this.tbufferID);
     var vTexCoords = gl.getAttribLocation(this.program, "vTexCoords");
     gl.vertexAttribPointer(vTexCoords, 2, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(vTexCoords);
 
-    // Connect the texture index data to the program shader variables
     gl.bindBuffer(gl.ARRAY_BUFFER, this.tibufferID);
     var vTexIndex = gl.getAttribLocation(this.program, "vTexIndex");
     gl.vertexAttribPointer(vTexIndex, 1, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(vTexIndex);
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, null);
-
     // Draw the sign
     gl.drawArrays(gl.TRIANGLES, 0, 6);
-
-    return;
   }
 }

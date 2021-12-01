@@ -29,8 +29,7 @@ class Cone {
       points.push(vec3(0, 1, 0));
       normals.push(normal);
 
-      indices.push(halfPts + 2 * i); // Push this index to the size count
-      
+      indices.push(halfPts + 2 * i);
     }
 
     for (var i = 0; i < nSectors + 1; i++) {
@@ -71,32 +70,30 @@ class Cone {
   }
 
   render() {
-    let gl = this.gl; // Since we are seperated with classes
+    let gl = this.gl;
 
-    // Connect the vertex data to the program shader variables
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vbufferID);
     let vPosition = gl.getAttribLocation(this.program, "vPosition");
     gl.vertexAttribPointer(vPosition, 3, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(vPosition);
 
-    // Connect the color data to the program shader variables
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.cbufferID);
+    // color data
     let vColor = gl.getAttribLocation(this.program, "vColor");
     gl.vertexAttribPointer(vColor, 3, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(vColor);
 
-    // Connect the normal data to the program shader variables
+    // normal data
     gl.bindBuffer(gl.ARRAY_BUFFER, this.nbufferID);
     let vNormal = gl.getAttribLocation(this.program, "vNormal");
     gl.vertexAttribPointer(vNormal, 3, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(vNormal);
 
-    // Connect the indices data to use here
+    // indices data
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.ibufferID);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
-    // Draw the cone
+    // Draw object
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 2 * this.nSectors + 2); // Sides
     gl.drawElements(gl.TRIANGLE_FAN, this.nSectors + 1, gl.UNSIGNED_BYTE, 0); // Top Base
     gl.drawElements(gl.TRIANGLE_FAN, this.nSectors + 1, gl.UNSIGNED_BYTE, this.nSectors + 1); // Bottom Base

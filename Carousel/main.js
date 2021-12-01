@@ -1,5 +1,5 @@
-let program; // The shader program
-let gl; // WebGL graphics environment
+let program;
+let gl;
 let carousel;
 let wheel;
 let sign;
@@ -13,11 +13,18 @@ let lookAT = vec3(8, 0, 3); // The point at which the camera is pointed
 let lookUP = vec3(0, 1, 0); // Restricts location about the eye->at vector
 let viewXform;
 
+let wheelSpeed = 1;
+let trainSpeed = 1;
+let carouselSpeed = 1;
+
 window.onload = init = () => {
   // Configure WebGL
   configureWebGl();
 
-  webglLessonsUI.setupSlider("#shininess", { value: 1, slide: updateShininess, min: 0.0, max: 500.0 });
+  // UI elements
+  webglLessonsUI.setupSlider("#wheelSpeed", { value: 1, slide: updateWheelSpeed, min: 0.0, max: 6.0 });
+  webglLessonsUI.setupSlider("#trainSpeed", { value: 1, slide: updateTrainSpeed, min: 0.0, max: 6.0 });
+  webglLessonsUI.setupSlider("#carouselSpeed", { value: 1, slide: updateCarouselSpeed, min: 0.0, max: 6.0 });
 
   gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
@@ -78,19 +85,23 @@ function render() {
 
   sign.render(); // render the sign
   ground.render([12, -3, 12]);
-  train.render(time, [0, -4, 22]);
-  wheel.render(time, [10, 8, 12]);
-  carousel.render(time, [8, -2, 20]);
+  train.render(time, [0, -4, 22], trainSpeed);
+  wheel.render(time, [10, 8, 12], wheelSpeed);
+  carousel.render(time, [8, -2, 20], carouselSpeed);
   // set the shininess in the shader
   let uShininessLoc = gl.getUniformLocation(program, "uShininess");
   gl.uniform1f(uShininessLoc, shine);
 
   requestAnimFrame(render); // Continously loop through this render function
 }
-function updateShininess(event, ui) {
-  console.log(ui.value);
-  let shininess = ui.value;
-  sine = shininess;
+function updateWheelSpeed(event, ui) {
+  wheelSpeed = ui.value;
+}
+function updateTrainSpeed(event, ui) {
+  trainSpeed = ui.value;
+}
+function updateCarouselSpeed(event, ui) {
+  carouselSpeed = ui.value;
 }
 
 function calcNormalMatrix(viewXform, modelXform) {

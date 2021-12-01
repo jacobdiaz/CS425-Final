@@ -35,9 +35,10 @@ class Wheel {
     }
   }
 
-  render(time, position) {
+  render(time, position, speed) {
     // Rotate the wheel 1/3 of the speed of the Carousel
-    let wheel_rotation = rotateX(time / 3);
+    const originalSpeed = time / 3;
+    let wheel_rotation = rotateX(originalSpeed * speed);
     let wheel_translation = mat4();
 
     // Set the wheel to the parameter position

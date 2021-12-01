@@ -1,8 +1,5 @@
 class Carousel {
   constructor(gl, program) {
-    this.program = program;
-    this.gl = gl;
-
     // #region Colors
     let coneColors = this.randomHorseColor();
     let cylinderColors = this.randomHorseColor();
@@ -50,7 +47,7 @@ class Carousel {
     this.cylinders = [];
     this.coneXform = [];
 
-    // Perform the cylinder transformations for each of the 4 cylinders, reuse the cone colors
+    // cylinder transforms for each of the 4 cylinders,
     this.cylindersXform = [];
     for (let i = 0; i < 4; i++) {
       this.cylindersXform[i] = mult(
@@ -60,7 +57,7 @@ class Carousel {
       this.cylinders[i] = new Cylinder(12, gl, program, cylinderColors[i], 0);
     }
 
-    // Perform the cone transformations for each of the 4 cones
+    // cone transforms for each of the 4 cones
     for (let i = 0; i < 4; i++) {
       let coneRot = rotate(90, axes[i]);
       let coneTrans = translate(coneTranslation[i][0], coneTranslation[i][1], coneTranslation[i][2]);
@@ -70,33 +67,32 @@ class Carousel {
     }
   }
 
-  render(time, position) {
-    let carousel_rotation = rotateY(time); // Get the rotation matrix of the carousel
+  render(time, position, speed) {
+    let carousel_rotation = rotateY(time * speed);
     let carousel_translation = mat4();
 
-    // If given valid position, set the translate matrix, otherwise ignore
     carousel_translation = translate(position[0], position[1], position[2]);
 
-    let carousel_Xform = mult(carousel_translation, carousel_rotation); // The overall carousel transformation
+    let carousel_Xform = mult(carousel_translation, carousel_rotation); // The overall carousel
 
     let uModelXform = gl.getUniformLocation(program, "uModelXform");
     let vNormalTransformation = gl.getUniformLocation(program, "vNormalTransformation");
 
-    // Transform the Bottom base of the carousel
+    // Bottom base of the carousel
     let btransformation = mult(carousel_Xform, this.baseXTransform);
     gl.uniformMatrix4fv(uModelXform, false, flatten(btransformation));
     let bnormalTransformation = normalMatrix(btransformation, true);
     gl.uniformMatrix3fv(vNormalTransformation, false, flatten(bnormalTransformation));
     this.base.render();
 
-    // Transform the Bottom Depth cylinder of the carousel
+    // Bottom Depth cylinder of the carousel
     let bdtransformation = mult(carousel_Xform, this.baseDepthXTransform);
     gl.uniformMatrix4fv(uModelXform, false, flatten(bdtransformation));
     let bdnormalTransformation = normalMatrix(bdtransformation, true);
     gl.uniformMatrix3fv(vNormalTransformation, false, flatten(bdnormalTransformation));
     this.centerPole.render();
 
-    // Transform the Top piece and render it
+    // Top piece
     let ttransformation = mult(carousel_Xform, this.topXTranmsform);
     gl.uniformMatrix4fv(uModelXform, false, flatten(ttransformation));
     let tnormalTransformation = normalMatrix(ttransformation, true);
@@ -111,7 +107,7 @@ class Carousel {
     this.centerPole.render();
 
     for (let i = 0; i < 4; i++) {
-      // Combine with the carousel transformation to get final position of the cylinder, render it
+      // Combine with the transformation to get final pos
       let ptransformation = mult(carousel_Xform, this.cylindersXform[i]);
       gl.uniformMatrix4fv(uModelXform, false, flatten(ptransformation));
       let pnormalTransformation = normalMatrix(ptransformation, true);
