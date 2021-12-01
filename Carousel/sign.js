@@ -1,5 +1,5 @@
 class Sign {
-  constructor(gl, program) {
+  constructor(gl, program, imageSrc) {
     this.gl = gl; // WebGL graphics environment
     this.program = program; // The shader program
 
@@ -8,16 +8,25 @@ class Sign {
     var normals = []; // Vertex normal data
     var texCoords = []; // Vertex texture coordinate data
     var texindex = []; // Texture Index for which texture to map or not
-    var size = 60;
-    var depth = 120;
-    // The
-    points.push(vec3(0, 0, depth));
-    points.push(vec3(0, size, depth));
-    points.push(vec3(size, 0, depth));
-    points.push(vec3(size, 0, depth));
-    points.push(vec3(0, size, depth));
-    points.push(vec3(size, size, depth));
 
+    var size = 80;
+    var depth = 120;
+    if (imageSrc == "spongeBob") {
+      points.push(vec3(0, 0, depth));
+      points.push(vec3(0, size, depth));
+      points.push(vec3(size, 0, depth));
+      points.push(vec3(size, 0, depth));
+      points.push(vec3(0, size, depth));
+      points.push(vec3(size, size, depth));
+    }
+    if(imageSrc == "concrete"){
+        points.push(vec3(0, 0, depth));
+        points.push(vec3(0, size-20, depth));
+        points.push(vec3(size-20, 0, depth));
+        points.push(vec3(size-20, 0, depth));
+        points.push(vec3(0, size-20, depth));
+        points.push(vec3(size, size-20, depth));
+    }
     // Calculate the normal for this sign
     var normal = cross(subtract(vec3(0, size, depth), vec3(0, 0, depth)), subtract(vec3(size, 0, depth), vec3(0, 0, depth)));
     for (var i = 0; i < 6; i++) {
@@ -34,7 +43,7 @@ class Sign {
     texCoords.push(vec2(0.0, 1.0));
 
     for (var i = 0; i < 12; i++) {
-      texindex.push(2.0); 
+      texindex.push(2.0);
     }
 
     // Push Vertex Location Data to GPU
@@ -63,7 +72,7 @@ class Sign {
     gl.bufferData(gl.ARRAY_BUFFER, flatten(texindex), gl.STATIC_DRAW);
 
     var image = new Image();
-    var image = document.getElementById("bricks"); // File loaded in html code, accessed here.
+    var image = document.getElementById(imageSrc); // File loaded in html code, accessed here.
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
     var texture = gl.createTexture();
     gl.activeTexture(gl.TEXTURE0);

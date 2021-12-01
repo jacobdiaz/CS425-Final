@@ -27,7 +27,6 @@ class Wheel {
     this.cartXform = [];
     this.cart = [];
 
-
     for (let i = 0; i < 8; i++) {
       // Cart transformation to all 8 carts
       this.cartXform[i] = mult(translate(cartTranslation[i][0], cartTranslation[i][1], cartTranslation[i][2]), cartScale);
@@ -43,6 +42,7 @@ class Wheel {
 
     // Set the wheel to the parameter position
     wheel_translation = translate(position[0], position[1], position[2]);
+    wheel_translation = mult(wheel_translation, rotateY(23));
 
     // perform wheel transformation
     let wheel_Xform = mult(wheel_translation, wheel_rotation);

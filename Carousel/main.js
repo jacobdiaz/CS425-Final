@@ -8,8 +8,8 @@ let sign;
 let eye = vec4(20.0, 2.0, 15.0);
 let originalEye = vec4(30.0, 2.0, 15.0);
 let cameraXform = mat4(); // The camera transformation matrix
-let lookEYE = vec3(-3, 3, -3); // The camera eye is positioned
-let lookAT = vec3(3, 0, 3); // The point at which the camera is pointed
+let lookEYE = vec3(-16, 5.5, 8); // The camera eye is positioned
+let lookAT = vec3(8, 0, 3); // The point at which the camera is pointed
 let lookUP = vec3(0, 1, 0); // Restricts location about the eye->at vector
 let viewXform;
 
@@ -32,8 +32,8 @@ window.onload = init = () => {
   gl.uniformMatrix3fv(vNormalTransformation, false, flatten(normalTransformation));
 
   // Set the lightposition as a vec3 at the origin and send it to the GPU
-
-  sign = new Sign(gl, program);
+  sign = new Sign(gl, program, "spongeBob");
+  ground = new Ground(gl, program);
   carousel = new Carousel(gl, program);
   wheel = new Wheel(gl, program);
 
@@ -74,10 +74,11 @@ function render() {
   time += 1;
 
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-  
+
   sign.render(); // render the sign
-  wheel.render(time, [25, 6, 12]); // Redraw the Ferris Wheel
-  carousel.render(time, [8, -2, 15]); // Redraw the
+  ground.render([12, -3, 12]);
+  wheel.render(time, [10, 8, 12]); // Redraw the Ferris Wheel
+  carousel.render(time, [8, -2, 20]); // Redraw the
   // set the shininess in the shader
   let uShininessLoc = gl.getUniformLocation(program, "uShininess");
   gl.uniform1f(uShininessLoc, shine);

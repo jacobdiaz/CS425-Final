@@ -44,6 +44,7 @@ class Carousel {
     // Carousel Frame consists of a base acylindar, a top acylindar, and a middle acylindar
     this.base = new Cone(60, gl, program, baseColor);
     this.centerPole = new Cylinder(25, gl, program, baseColor, 1.0);
+    this.top = new Cone(10, gl, program, vec3(0, 1, 0));
 
     this.cones = [];
     this.cylinders = [];
@@ -100,7 +101,7 @@ class Carousel {
     gl.uniformMatrix4fv(uModelXform, false, flatten(ttransformation));
     let tnormalTransformation = normalMatrix(ttransformation, true);
     gl.uniformMatrix3fv(vNormalTransformation, false, flatten(tnormalTransformation));
-    this.base.render();
+    this.top.render();
 
     // Transform the Middle piece and render it
     let mtransformation = mult(carousel_Xform, this.midXTransform);
@@ -144,10 +145,9 @@ class Carousel {
     return colors;
   };
   randomBaseColor = () => {
-    // Range is small to keep the colors dark
-    const min = 0;
-    const max = 0.3;
-    // return vec3(Math.random() * (max - min) + min, Math.random() * (max - min) + min, Math.random() * (max - min) + min);
-    return vec3(0.8, 0, 0);
+    const min = 0.3;
+    const max = 0.9;
+    return vec3(Math.random() * (max - 0.5) + 0.5, Math.random() * (max - min) + min, Math.random() * (max - 0.5) + 0.5);
+    // return vec3(0.8, 0, 0);
   };
 }
