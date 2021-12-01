@@ -4,47 +4,49 @@ let carousel;
 let wheel;
 let sign;
 
-// Camera variables
-let eye = vec4(20.0, 2.0, 15.0);
-let originalEye = vec4(30.0, 2.0, 15.0);
-let cameraXform = mat4(); // The camera transformation matrix
-let lookEYE = vec3(-16, 5.5, 8); // The camera eye is positioned
-let lookAT = vec3(8, 0, 3); // The point at which the camera is pointed
-let lookUP = vec3(0, 1, 0); // Restricts location about the eye->at vector
-let viewXform;
-
+// values for sliders
 let wheelSpeed = 1;
 let trainSpeed = 1;
 let carouselSpeed = 1;
+
+// Camera variables
+let eye = vec4(20.0, 2.0, 15.0);
+let originalEye = vec4(30.0, 2.0, 15.0);
+let cameraXform = mat4();
+let lookEYE = vec3(-16, 5.5, 8); 
+let lookAT = vec3(8, 0, 3);
+let lookUP = vec3(0, 1, 0);
+let viewXform;
 
 window.onload = init = () => {
   // Configure WebGL
   configureWebGl();
 
   // UI elements
-  webglLessonsUI.setupSlider("#wheelSpeed", { value: 1, slide: updateWheelSpeed, min: 0.0, max: 6.0 });
-  webglLessonsUI.setupSlider("#trainSpeed", { value: 1, slide: updateTrainSpeed, min: 0.0, max: 6.0 });
-  webglLessonsUI.setupSlider("#carouselSpeed", { value: 1, slide: updateCarouselSpeed, min: 0.0, max: 6.0 });
+  webglLessonsUI.setupSlider("#wheelSpeed", { value: 1, slide: updateWheelSpeed, min: -1.0, max: 6.0 });
+  webglLessonsUI.setupSlider("#trainSpeed", { value: 1, slide: updateTrainSpeed, min: -1.0, max: 6.0 });
+  webglLessonsUI.setupSlider("#carouselSpeed", { value: 1, slide: updateCarouselSpeed, min: -1.0, max: 6.0 });
 
   gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
-  // Create the 3D to 2D projection matrix using perspective( ) and send it to the GPU
+  // projection matrix using perspective
   let projection = perspective(50, aspectRatio, 0.5, 100.0);
   let uProjectionLoc = gl.getUniformLocation(program, "uProjection");
   gl.uniformMatrix4fv(uProjectionLoc, false, flatten(projection));
 
-  // Set the normal transformation matrix as a mat3 Identity matrix and send it to the GPU
+  // normal transform matrix
   let normalTransformation = mat3();
   let vNormalTransformation = gl.getUniformLocation(program, "vNormalTransformation");
   gl.uniformMatrix3fv(vNormalTransformation, false, flatten(normalTransformation));
 
-  // Set the lightposition as a vec3 at the origin and send it to the GPU
+  // Instantiate new componentes
   sign = new Sign(gl, program, "spongeBob");
   ground = new Ground(gl, program);
   train = new Train(gl, program);
   carousel = new Carousel(gl, program);
   wheel = new Wheel(gl, program);
 
+  // Render those bad boys
   render();
 };
 
@@ -83,17 +85,20 @@ function render() {
 
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-  sign.render(); // render the sign
+  // Render all the components
+  sign.render();
   ground.render([12, -3, 12]);
   train.render(time, [0, -4, 22], trainSpeed);
   wheel.render(time, [10, 8, 12], wheelSpeed);
   carousel.render(time, [8, -2, 20], carouselSpeed);
-  // set the shininess in the shader
+
   let uShininessLoc = gl.getUniformLocation(program, "uShininess");
   gl.uniform1f(uShininessLoc, shine);
 
-  requestAnimFrame(render); // Continously loop through this render function
+  requestAnimFrame(render);
 }
+
+// Handles the UI sliders
 function updateWheelSpeed(event, ui) {
   wheelSpeed = ui.value;
 }

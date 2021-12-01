@@ -4,25 +4,23 @@ class Cylinder {
     this.gl = gl;
     this.program = program;
 
-    var points = []; // Vertex location data
-    var colors = []; // Vertex color data
-    var normals = []; // Vertex normal data
-    var indices = []; // Indices data
+    var points = [];
+    var colors = [];
+    var normals = []; 
+    var indices = [];
     var texCoords = []; // Vertex texture coordinate data
     var texindex = []; // Texture Index for which texture to map or not
 
-    // Push a vec3 color for each vertex
+    // Populate the colors arr
     for (var i = 0; i < 2 * (2 * nSectors + 2); i++) {
       colors.push(vec3(color));
     }
 
     var dTheta = radians(360 / nSectors);
-    // Bottom and Top side vertices have different normals than the sides, so we must double those vertices
     var halfPts = 2 * nSectors + 2;
 
     // The sides of the cylinder
     for (i = 0; i < nSectors + 1; i++) {
-      // Duplicate the starting point
       var theta = i * dTheta;
 
       var normal = vec3(Math.cos(theta), 0, Math.sin(theta));
@@ -36,12 +34,11 @@ class Cylinder {
       normals.push(normal);
       texCoords.push(vec2(i / nSectors, 1.0));
 
-      indices.push(halfPts + 2 * i); // Push this index to the size count
+      indices.push(halfPts + 2 * i); 
       texindex.push(0.0);
       texindex.push(0.0);
     }
 
-    // The top and bottom of the cylinder
     for (i = 0; i < nSectors + 1; i++) {
       var theta = i * dTheta;
 
